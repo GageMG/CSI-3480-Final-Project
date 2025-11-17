@@ -2,17 +2,17 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import uuid
 
-# Initialize Firebase Admin SDK only ONCE
+# Initialize Firebase Admin SDK 
 cred = credentials.Certificate("csi-3480-final-project-firebase-adminsdk-fbsvc-d81a131ec3.json")
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-# ------------------- USER FUNCTIONS -------------------
+# USER FUNCTIONS
 
 def create_user(email, verifier, salt):
-    """Create a new user in Firestore with a unique GUID."""
+    "Create a new user in Firestore with a unique GUID."
     users_ref = db.collection('users')
     
     existing_user = users_ref.where('email', '==', email).get()
@@ -32,13 +32,13 @@ def create_user(email, verifier, salt):
 
 
 def delete_user(guid):
-    """Delete a user and all items associated with them."""
+    "Delete a user and all items associated with them."
     user_ref = db.collection('users').document(guid)
     if not user_ref.get().exists:
         print(f" User with GUID {guid} does not exist.")
         return False
 
-    # Delete all items associated with this user
+    # Delete all items from this user
     items_ref = db.collection('items')
     items = items_ref.where('user_guid', '==', guid).get()
     batch = db.batch()
@@ -53,7 +53,7 @@ def delete_user(guid):
 
 
 def get_salt(email):
-    """Return the salt associated with an email, or None if not found."""
+    "Return the salt associated with an email, or None if not found."
     users_ref = db.collection('users')
     user_docs = users_ref.where('email', '==', email).get()
     if not user_docs:
@@ -64,10 +64,10 @@ def get_salt(email):
     return salt
 
 
-# ------------------- ITEM FUNCTIONS -------------------
+#ITEM FUNCTIONS 
 
 def create_item(user_guid, name, username, password):
-    """Create an item associated with a user."""
+    "Create an item associated with a user."
     items_ref = db.collection('items')
     guid = str(uuid.uuid4())
 
@@ -83,7 +83,7 @@ def create_item(user_guid, name, username, password):
 
 
 def delete_item(guid):
-    """Delete an item by GUID."""
+    "Delete an item by GUID."
     item_ref = db.collection('items').document(guid)
     if item_ref.get().exists:
         item_ref.delete()
