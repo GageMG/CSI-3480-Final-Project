@@ -9,20 +9,35 @@ import { Input } from '@/components/ui/Input';
 
 import { register } from '@/actions/auth';
 
+import { isValidEmail } from '@/util/string';
+
 function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   
   async function handleRegister() {
-    if(!email || !password) {
+    if(!email || !password || !confirmPassword) {
       alert('Please fill in all fields.');
+      // Missing fields.
+      return;
+    }
+    if(!isValidEmail(email)) {
+      alert('Invalid email.');
+      // Invalid email.
+      return;
+    }
+    if(password !== confirmPassword) {
+      alert('Passwords do not match.');
+      // Passwords do not match.
       return;
     }
 
-    const success = await register(email, password);
-    if(success) {
+    const registerSuccess = await register(email, password);
+    if(registerSuccess) {
       redirect('/');
     }
+
     alert('Registration failed. Please try again.');
   }
   
@@ -40,6 +55,13 @@ function RegisterForm() {
         value={password}
         onChange={(e) => {
           setPassword(e.target.value)
+        }}
+      />
+      <Input
+        placeholder='Confirm Password'
+        value={confirmPassword}
+        onChange={(e) => {
+          setConfirmPassword(e.target.value)
         }}
       />
       <Button onClick={handleRegister}>
