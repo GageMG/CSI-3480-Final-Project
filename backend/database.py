@@ -17,7 +17,7 @@ def create_user(email, verifier, salt):
     
     existing_user = users_ref.where('email', '==', email).get()
     if len(existing_user) > 0:
-        print(f"⚠️ User with email {email} already exists.")
+        print(f" User with email {email} already exists.")
         return None
 
     guid = str(uuid.uuid4())
@@ -27,7 +27,7 @@ def create_user(email, verifier, salt):
         'salt': salt
     })
 
-    print(f"✅ User created with GUID: {guid}")
+    print(f" User created with GUID: {guid}")
     return guid
 
 
@@ -35,7 +35,7 @@ def delete_user(guid):
     """Delete a user and all items associated with them."""
     user_ref = db.collection('users').document(guid)
     if not user_ref.get().exists:
-        print(f"⚠️ User with GUID {guid} does not exist.")
+        print(f" User with GUID {guid} does not exist.")
         return False
 
     # Delete all items associated with this user
@@ -44,11 +44,11 @@ def delete_user(guid):
     batch = db.batch()
     for item in items:
         batch.delete(item.reference)
-        print(f"🗑️ Queued deletion for item {item.id}")
+        print(f" Queued deletion for item {item.id}")
     batch.delete(user_ref)
     batch.commit()
 
-    print(f"🗑️ User with GUID {guid} and all associated items deleted.")
+    print(f" User with GUID {guid} and all associated items deleted.")
     return True
 
 
@@ -57,10 +57,10 @@ def get_salt(email):
     users_ref = db.collection('users')
     user_docs = users_ref.where('email', '==', email).get()
     if not user_docs:
-        print(f"⚠️ No user found with email {email}.")
+        print(f" No user found with email {email}.")
         return None
     salt = user_docs[0].to_dict().get('salt')
-    print(f"🔑 Salt for {email} is: {salt}")
+    print(f" Salt for {email} is: {salt}")
     return salt
 
 
@@ -78,7 +78,7 @@ def create_item(user_guid, name, username, password):
         'password': password
     })
 
-    print(f"✅ Item created with GUID: {guid}")
+    print(f" Item created with GUID: {guid}")
     return guid
 
 
@@ -87,8 +87,8 @@ def delete_item(guid):
     item_ref = db.collection('items').document(guid)
     if item_ref.get().exists:
         item_ref.delete()
-        print(f"🗑️ Item with GUID {guid} deleted.")
+        print(f" Item with GUID {guid} deleted.")
         return True
     else:
-        print(f"⚠️ Item with GUID {guid} does not exist.")
+        print(f" Item with GUID {guid} does not exist.")
         return False
