@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from Func import db_get_salt, db_register_user
+from Func import db_get_salt, db_register_user, db_delete_user
 
 app = Flask(__name__)
 
@@ -33,3 +33,10 @@ def login():
   verifier = data["verifier"]
 
   return "", 200
+
+@app.route("/delete-user", methods=["DELETE"])
+def delete_user_route(guid):
+  success = db_delete_user(guid)
+  if success:
+    return "", 203
+  return "", 403

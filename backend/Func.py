@@ -11,7 +11,13 @@ def db_register_user(email, salt, verifier):
 
 
 def db_delete_user(guid):
-  return delete_user(guid)
+   try:
+      success = delete_user(guid)
+      return success
+   except Exception as e:
+      print(f"error deleting user: {e}")
+      return False
+      
 
 def db_create_item(user_guid, name, username, password):
   return create_item(user_guid, name, username, password)
