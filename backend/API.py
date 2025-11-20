@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from Func import db_get_salt, db_register_user, db_delete_user, db_create_item, db_delete_item
+from Func import db_get_salt, db_create_user, db_delete_user, db_create_item, db_delete_item
 
 app = Flask(__name__)
 
@@ -21,7 +21,7 @@ def register():
   salt = data["salt"]
   verifier = data["verifier"]
 
-  success = db_register_user(email, salt, verifier)
+  success = db_create_user(email, salt, verifier)
   if success:
       return "", 201
   return "", 400

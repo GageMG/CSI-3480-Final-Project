@@ -6,8 +6,15 @@ def db_get_salt(email):
       return ""
   return response
 
-def db_register_user(email, salt, verifier):
-  return create_user(email, salt, verifier)
+def db_create_user(email, verifier, salt):
+  try:
+     guid = create_user(email, verifier, salt)
+     if guid is None:
+        return None
+     return guid
+  except Exception as e:
+    print(f"error creating user: {e}")
+  return None
 
 
 def db_delete_user(guid):
@@ -34,5 +41,3 @@ def db_delete_item(item_guid):
     except Exception as e:
        print(f"error deleting item: {e}")
        return False
-    
-def 
