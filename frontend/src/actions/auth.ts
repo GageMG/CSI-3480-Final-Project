@@ -30,7 +30,7 @@ export async function login(email: string, password: string): Promise<boolean> {
   if (typeof salt !== 'string') {
     return false;
   }
-  const verifier = pbkdf2Sync(password, salt, 1, 32).toString('hex');
+  const verifier = pbkdf2Sync(password, salt, 500000, 32, 'sha256').toString('hex');
 
   const loginResponse = await post('/login', {
     email,
