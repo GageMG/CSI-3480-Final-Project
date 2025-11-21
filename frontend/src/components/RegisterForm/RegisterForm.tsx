@@ -92,7 +92,7 @@ function RegisterForm() {
       </CardHeader>
       <CardContent className='flex flex-col gap-4'>
         <FieldGroup>
-          <Field>
+          <Field data-invalid={errors.email !== ''}>
             <FieldLabel htmlFor='email'>Email</FieldLabel>
             <Input
               placeholder='Email'
@@ -104,7 +104,7 @@ function RegisterForm() {
             />
             <FieldError>{errors.email}</FieldError>
           </Field>
-          <Field>
+          <Field data-invalid={errors.password !== ''}>
             <FieldLabel htmlFor='password'>Password</FieldLabel>
             <Input
               placeholder='Password'
@@ -117,7 +117,7 @@ function RegisterForm() {
             />
             <FieldError>{errors.password}</FieldError>
           </Field>
-          <Field>
+          <Field data-invalid={errors.confirmPassword !== ''}>
             <FieldLabel htmlFor='confirmPassword'>Confirm Password</FieldLabel>
             <Input
               placeholder='Confirm Password'
