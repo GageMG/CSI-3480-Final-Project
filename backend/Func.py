@@ -49,4 +49,29 @@ def db_get_all_user_items(user_guid):
     except Exception as e:
        print(f"error getting user items: {e}")
        return None
+    
+def db_login_user(email, verifier):
+   try:
+      users_ref = db.collection('users')
+      user_docs = users_ref.where('email', '==', email).get()
+
+      user_doc = None
+      for doc in user_docs:
+          user_doc = doc
+          break
+      
+      if user_doc is None:
+          print(f" No user found with that email.")
+          return None
+      
+      user_data = user_doc.to_dict()
+
+      if user_data["verifier"] != verifier:
+          print(f" The verifier does not match.")
+          return None
+      
+      return user_doc.id
+   except Exception as e:
+      print(f"error logging in user: {e}")
+      return None
       

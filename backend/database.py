@@ -106,3 +106,21 @@ def get_all_user_items(user_guid):
 
     print(f" Retrieved {len(results)} items for user {user_guid}")
     return results
+
+def login_user(email, verifier):
+    "Return user's GUID if email and verifier match, else None."
+    users_ref = db.collection('users')
+    user_docs = users_ref.where('email', '==', email).get()
+
+    if not user_docs:
+        print(f" No user found with email {email}.")
+        return None
+    
+    user_data = user_docs[0].to_dict()
+
+    if user_data.get["verifier"] != verifier:
+        print(f" Verifier does not match with this email {email}.")
+        return None
+
+    print(f" User with email {email} logged in successfully.")
+    return user_docs[0].id
