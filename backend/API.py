@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from Func import db_get_salt, db_create_user, db_delete_user, db_create_item, db_delete_item, db_get_all_user_items
+from Func import db_get_salt, db_create_user, db_delete_user, db_create_item, db_delete_item, db_get_all_user_items, db_login_user
 
 app = Flask(__name__)
 
@@ -33,8 +33,11 @@ def login():
   verifier = data["verifier"]
 
   # TODO: Check if login is valid.
+  guid = db_login_user(email, verifier)
+  if guid is None:
+     return jsonify({"error": "invalid login"}), 403
 
-  return "", 200
+  return jsonify({"guid": guid}), 200
 
 @app.route("/delete-user", methods=["DELETE"])
 def delete_user_route(guid):
