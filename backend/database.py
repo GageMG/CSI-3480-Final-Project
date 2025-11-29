@@ -1,126 +1,117 @@
-import firebase_admin
+
+    import firebase_admin
 from firebase_admin import credentials, firestore
 import uuid
 
-# Initialize Firebase Admin SDK 
+# Initialize Firebase Admin SDK
 cred = credentials.Certificate("csi-3480-final-project-firebase-adminsdk-fbsvc-d81a131ec3.json")
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
+
 # USER FUNCTIONS
 
 def create_user(email, verifier, salt):
-    "Create a new user in Firestore with a unique GUID."
     users_ref = db.collection('users')
-    
-    existing_user = users_ref.where('email', '==', email).get()
-    if len(existing_user) > 0:
-        print(f" User with email {email} already exists.")
+
+    existing = users_ref.where('email', '==', email).get()
+    if len(existing) > 0:
+        print(f"User with email {email} already exists.")
         return None
 
     guid = str(uuid.uuid4())
     users_ref.document(guid).set({
-        'email': email,
-        'verifier': verifier,
-        'salt': salt
+        "email": email,
+        "verifier": verifier,
+        "salt": salt
     })
 
-    print(f" User created with GUID: {guid}")
+    print(f"User created with GUID: {guid}")
     return guid
 
 
 def delete_user(guid):
-    "Delete a user and all items associated with them."
     user_ref = db.collection('users').document(guid)
     if not user_ref.get().exists:
-        print(f" User with GUID {guid} does not exist.")
+        print(f"User with GUID {guid} does not exist.")
         return False
 
-    # Delete all items from this user
     items_ref = db.collection('items')
-    items = items_ref.where('user_guid', '==', guid).get()
+    items = items_ref.where("user_guid", "==", guid).get()
+
     batch = db.batch()
     for item in items:
         batch.delete(item.reference)
-        print(f" Queued deletion for item {item.id}")
     batch.delete(user_ref)
     batch.commit()
 
-    print(f" User with GUID {guid} and all associated items deleted.")
+    print(f"User {guid} and all items deleted.")
     return True
 
 
 def get_salt(email):
-    "Return the salt associated with an email, or None if not found."
     users_ref = db.collection('users')
-    user_docs = users_ref.where('email', '==', email).get()
-    if not user_docs:
-        print(f" No user found with email {email}.")
+    docs = users_ref.where("email", "==", email).get()
+    if not docs:
         return None
-    salt = user_docs[0].to_dict().get('salt')
-    print(f" Salt for {email} is: {salt}")
-    return salt
+    return docs[0].to_dict().get("salt")
 
 
-#ITEM FUNCTIONS 
+def login_user(email, verifier):
+    users_ref = db.collection('users')
+    docs = users_ref.where("email", "==", email).get()
+
+    if not docs:
+        print("No user with that email.")
+        return None
+
+    user_data = docs[0].to_dict()
+    if user_data["verifier"] != verifier:
+        print("Verifier mismatch.")
+        return None
+
+    return docs[0].id
+
+
+# ITEM FUNCTIONS
 
 def create_item(user_guid, name, username, password):
-    "Create an item associated with a user."
     items_ref = db.collection('items')
     guid = str(uuid.uuid4())
 
     items_ref.document(guid).set({
-        'user_guid': user_guid,
-        'name': name,
-        'username': username,
-        'password': password
+        "user_guid": user_guid,
+        "name": name,
+        "username": username,
+        "password": password
     })
 
-    print(f" Item created with GUID: {guid}")
+    print(f"Item created with GUID: {guid}")
     return guid
 
 
 def delete_item(guid):
-    "Delete an item by GUID."
     item_ref = db.collection('items').document(guid)
-    if item_ref.get().exists:
-        item_ref.delete()
-        print(f" Item with GUID {guid} deleted.")
-        return True
-    else:
-        print(f" Item with GUID {guid} does not exist.")
+    if not item_ref.get().exists:
+        print("Item does not exist.")
         return False
 
+    item_ref.delete()
+    print(f"Item {guid} deleted.")
+    return True
+
+
 def get_all_user_items(user_guid):
-    "Return all items that belong to a specific user."
-    items_ref = db.collection('items')
-    items = items_ref.where('user_guid', '==', user_guid).get()
+    items_ref = db.collection("items")
+    docs = items_ref.where("user_guid", "==", user_guid).get()
 
     results = []
-    for item in items:
-        data = item.to_dict()
-        data["guid"] = item.id
+    for doc in docs:
+        data = doc.to_dict()
+        data["guid"] = doc.id
         results.append(data)
 
-    print(f" Retrieved {len(results)} items for user {user_guid}")
+    print(f"Retrieved {len(results)} items.")
     return results
-
-def login_user(email, verifier):
-    "Return user's GUID if email and verifier match, else None."
-    users_ref = db.collection('users')
-    user_docs = users_ref.where('email', '==', email).get()
-
-    if not user_docs:
-        print(f" No user found with email {email}.")
-        return None
-    
-    user_data = user_docs[0].to_dict()
-
-    if user_data.get["verifier"] != verifier:
-        print(f" Verifier does not match with this email {email}.")
-        return None
-
-    print(f" User with email {email} logged in successfully.")
-    return user_docs[0].id
