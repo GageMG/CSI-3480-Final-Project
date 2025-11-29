@@ -5,72 +5,84 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-  return "<p>Hello, World!</p>"
+    return "<p>Hello, World!</p>"
 
 @app.route("/get-salt", methods=["GET"])
 def get_salt():
-  email = request.args.get("email")
-  salt = db_get_salt(email)
+    email = request.args.get("email")
+    salt = db_get_salt(email)
 
-  return jsonify({ "salt": salt }), 401 if salt == "" else 200
+    return jsonify({ "salt": salt }), 401 if salt == "" else 200
 
 @app.route("/register", methods=["POST"])
 def register():
-  data = request.json
-  email = data["email"]
-  salt = data["salt"]
-  verifier = data["verifier"]
-  encDek = data["encDek"]
+    data = request.json
+    email = data["email"]
+    salt = data["salt"]
+    verifier = data["verifier"]
+    encDek = data["encDek"]
 
-  status = db_create_user(email, salt, verifier, encDek)
-  return "", status
+    status = db_create_user(email, salt, verifier, encDek)
+    return "", status
 
 @app.route("/login", methods=["POST"])
 def login():
-  data = request.json
-  email = data["email"]
-  verifier = data["verifier"]
+    data = request.json
+    email = data["email"]
+    verifier = data["verifier"]
 
-  encDek = db_login_user(email, verifier)
-  if encDek is None:
-     return "", 403
-
-  return jsonify({ "encDek": encDek }), 200
+    encDek = db_login_user(email, verifier)
+    if encDek is None:
+        return "", 403
+    return jsonify({ "encDek": encDek }), 200
 
 @app.route("/delete-user", methods=["DELETE"])
-def delete_user_route(guid):
-  success = db_delete_user(guid)
-  if success:
-    return "", 203
-  return "", 403
+def delete_user_route():
+    data = request.json
+    guid = data["guid"]
+    success = db_delete_user(guid)
+
+    if success:
+        return "", 203
+    return "", 403
 
 @app.route("/create-item", methods=["POST"])
 def create_item_route():
-  data = request.json
-  item = data["item"]
-  user_guid = item["user_guid"]
-  name = item["name"]
-  username = item["username"]
-  password = item["password"]
+    data = request.json
+    item = data["item"]
 
-  success = db_create_item(user_guid, name, username, password)
-  if success:
-      return "", 201
-  return "", 404
+    user_guid = item["user_guid"]
+    name = item["name"]
+    username = item["username"]
+    password = item["password"]
+
+    success = db_create_item(user_guid, name, username, password)
+
+    if not success:
+        return jsonify({"error": "Could not save item"}), 500
+
+    return jsonify({"message": "Item saved"}), 201
 
 @app.route("/delete-item", methods=["DELETE"])
-def delete_item_route(item_guid):
-  success = db_delete_item(item_guid)
+def delete_item_route():
+    item_guid = request.args.get("item_guid")
+    success = db_delete_item(item_guid)
 
-  if success:
-      return "", 203
-  return "", 403
+    if success:
+            return "", 203
+    return "", 403
+
 
 @app.route("/get-user-items", methods=["GET"])
 def get_user_items_route():
-   items = db_get_all_user_items(user_guid)
+    user_guid = request.args.get("user_guid")
+    items = db_get_all_user_items(user_guid)
 
-   if items is None:
-      return jsonify({"error": "could not retrieve items"}), 505
-   
-   return jsonify({"items": items}), 200
+    if items is None:
+        return jsonify({"error": "Could not retrieve items"}), 505
+
+    return jsonify({"items": items}), 200
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
