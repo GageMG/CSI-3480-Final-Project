@@ -1,4 +1,4 @@
-export function randomSalt(length: number): string {
+export function randomString(length: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
   let result = '';
@@ -16,4 +16,17 @@ export function isValidEmail(email: string) {
   }
 
   return (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(email);
+}
+
+const minimumPasswordLength = 8;
+const minimumPasswordNumberCount = 1;
+export function passwordMeetsRequirements(password: string) {
+  if (password.length < minimumPasswordLength) {
+    return false;
+  }
+  if ((password.match(/\d/g) ?? []).length < minimumPasswordNumberCount) {
+    return false;
+  }
+
+  return true;
 }

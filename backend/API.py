@@ -20,11 +20,10 @@ def register():
   email = data["email"]
   salt = data["salt"]
   verifier = data["verifier"]
+  encDek = data["encDek"]
 
-  success = db_create_user(email, salt, verifier)
-  if success:
-      return "", 201
-  return "", 400
+  status = db_create_user(email, salt, verifier, encDek)
+  return "", status
 
 @app.route("/login", methods=["POST"])
 def login():

@@ -6,16 +6,11 @@ def db_get_salt(email):
       return ""
   return response
 
-def db_create_user(email, verifier, salt):
-  try:
-     guid = create_user(email, verifier, salt)
-     if guid is None:
-        return None
-     return guid
-  except Exception as e:
-    print(f"error creating user: {e}")
-  return None
-
+def db_create_user(email, verifier, salt, encDek):
+   try:
+      return create_user(email, verifier, salt, encDek)
+   except Exception as e:
+      return 400
 
 def db_delete_user(guid):
    try:

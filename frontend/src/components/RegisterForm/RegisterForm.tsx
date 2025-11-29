@@ -9,10 +9,13 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/Field';
+
 import { register } from '@/actions/auth';
 
-import { isValidEmail, randomSalt } from '@/util/string';
-import { passwordMeetsRequirements } from '@/util/password';
+import { useDek } from '@/hooks/dek';
+
+import { isValidEmail, passwordMeetsRequirements, randomString } from '@/util/string';
+import { encryptDek, getKek } from '@/util/client-auth';
 
 interface Errors {
   email: string;
@@ -22,6 +25,8 @@ interface Errors {
 }
 
 function RegisterForm() {
+  const { dek, setDek } = useDek();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -54,21 +59,27 @@ function RegisterForm() {
       foundErrors.confirmPassword = 'Passwords do not match.';
       hasErrors = true;
     }
-    setErrors(foundErrors);
 
     if (hasErrors) {
+      setErrors(foundErrors);
       return;
     }
 
-    const salt = randomSalt(32);
+    const salt = randomString(32);
     const verifier = pbkdf2Sync(password, salt, 1, 32).toString('hex');
+    const kek = await getKek(password, salt);
+    const dek = randomString(32);
+    const encDek = encryptDek(dek, kek);
 
-    const registerSuccess = await register(email, salt, verifier);
-    if (registerSuccess) {
+    const registerStatus = await register(email, salt, verifier, encDek);
+    if (registerStatus === 201) {
+      setDek(dek);
       redirect('/');
+    } else if (registerStatus === 409) {
+      foundErrors.email = 'An account with this email already exists.';
+    } else {
+      foundErrors.form = 'Registration failed. Please try again.';
     }
-
-    foundErrors.form = 'Registration failed. Please try again.';
     setErrors(foundErrors);
   }
 

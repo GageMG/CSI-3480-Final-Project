@@ -11,24 +11,23 @@ db = firestore.client()
 
 # USER FUNCTIONS
 
-def create_user(email, verifier, salt):
+def create_user(email, verifier, salt, encDek):
     "Create a new user in Firestore with a unique GUID."
     users_ref = db.collection('users')
     
     existing_user = users_ref.where('email', '==', email).get()
     if len(existing_user) > 0:
-        print(f" User with email {email} already exists.")
-        return None
+        return 409
 
     guid = str(uuid.uuid4())
     users_ref.document(guid).set({
         'email': email,
         'verifier': verifier,
-        'salt': salt
+        'salt': salt,
+        'encDek': encDek
     })
 
-    print(f" User created with GUID: {guid}")
-    return guid
+    return 201
 
 
 def delete_user(guid):

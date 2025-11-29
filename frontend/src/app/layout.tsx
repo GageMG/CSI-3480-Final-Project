@@ -4,6 +4,7 @@ import { Roboto } from 'next/font/google';
 import ThemeProvider from '@/components/ThemeProvider';
 
 import '@/styles/globals.css';
+import { ProvideDek } from '@/hooks/dek';
 
 const roboto = Roboto({ subsets: ['latin'] });
 
@@ -22,7 +23,9 @@ function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ProvideDek>
+            {children}
+          </ProvideDek>
         </ThemeProvider>
       </body>
     </html>

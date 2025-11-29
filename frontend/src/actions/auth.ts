@@ -6,18 +6,24 @@ import { pbkdf2Sync } from 'pbkdf2';
 import { getSession } from '@/util/auth';
 import { get, post } from '@/util/api';
 
-export async function register(email: string, verifier: string, salt: string): Promise<boolean> {
+export async function register(
+  email: string,
+  verifier: string,
+  salt: string,
+  encDek: string
+): Promise<number> {
   const response = await post('/register', {
     email,
     salt,
-    verifier
+    verifier,
+    encDek
   });
   if (response.status === 201) {
     const session = await getSession();
     session.isAuthenticated = true;
     await session.save();
   }
-  return response.status === 201;
+  return response.status;
 }
 
 export async function login(email: string, password: string): Promise<boolean> {

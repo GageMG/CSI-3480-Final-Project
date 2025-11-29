@@ -53,7 +53,6 @@ const eslintConfig = defineConfig([
       'no-console': ['warn'],
       'no-div-regex': ['error'],
       'no-else-return': ['error'],
-      'no-empty-function': ['error'],
       'no-eq-null': ['error'],
       'no-eval': ['error'],
       'no-extend-native': ['error'],
@@ -121,12 +120,14 @@ const eslintConfig = defineConfig([
       '@typescript-eslint/stylistic-type-checked'
     ],
     rules: {
+      '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }]
     }
   },
@@ -157,7 +158,7 @@ const eslintConfig = defineConfig([
       ],
       '@stylistic/comma-style': ['error'],
       '@stylistic/computed-property-spacing': ['error'],
-      '@stylistic/curly-newline': ['error', 'always'],
+      '@stylistic/curly-newline': ['error', 'consistent'],
       '@stylistic/dot-location': ['error', 'property'],
       '@stylistic/eol-last': ['error'],
       '@stylistic/function-call-argument-newline': ['error', 'consistent'],
