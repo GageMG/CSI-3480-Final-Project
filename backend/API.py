@@ -31,12 +31,11 @@ def login():
   email = data["email"]
   verifier = data["verifier"]
 
-  # TODO: Check if login is valid.
-  guid = db_login_user(email, verifier)
-  if guid is None:
-     return jsonify({"error": "invalid login"}), 403
+  encDek = db_login_user(email, verifier)
+  if encDek is None:
+     return "", 403
 
-  return jsonify({"guid": guid}), 200
+  return jsonify({ "encDek": encDek }), 200
 
 @app.route("/delete-user", methods=["DELETE"])
 def delete_user_route(guid):

@@ -26,31 +26,32 @@ export async function register(
   return response.status;
 }
 
-export async function login(email: string, password: string): Promise<boolean> {
-  const saltResponse = await get('/get-salt', { email });
-  if (saltResponse.status !== 200) {
-    return false;
+export async function getSalt(email: string): Promise<string | null> {
+  const response = await get('/get-salt', { email });
+  if (response.status !== 200) {
+    return null;
   }
+  return response.data.salt;
+}
 
-  const salt = saltResponse.data.salt;
-  if (typeof salt !== 'string') {
-    return false;
-  }
-  const verifier = pbkdf2Sync(password, salt, 500000, 32, 'sha256').toString('hex');
 
+export async function login(email: string, verifier: string): Promise<string> {
   const loginResponse = await post('/login', {
     email,
     verifier
   });
   if (loginResponse.status !== 200) {
-    return false;
+    return '';
+  }
+
+  const encDek = loginResponse.data.encDek;
+  if(!encDek) {
+    return '';
   }
 
   const session = await getSession();
   session.isAuthenticated = true;
   await session.save();
 
-  redirect('/');
-
-  return true;
+  return encDek;
 }

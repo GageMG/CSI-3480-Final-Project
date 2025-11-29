@@ -1,4 +1,4 @@
- import firebase_admin
+import firebase_admin
 from firebase_admin import credentials, firestore
 import uuid
 
@@ -66,12 +66,12 @@ def login_user(email, verifier):
         return None
 
     user_data = docs[0].to_dict()
+    
     if user_data["verifier"] != verifier:
         print("Verifier mismatch.")
         return None
 
-    return docs[0].id
-
+    return user_data["encDek"]
 
 # ITEM FUNCTIONS
 

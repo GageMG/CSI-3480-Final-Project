@@ -10,8 +10,7 @@ export const sessionOptions: SessionOptions = {
   cookieName: '_auth',
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',
-    // Set cookie to expire 5 minutes after log in.
-    maxAge: 60 * 5
+    maxAge: 5
   }
 };
 

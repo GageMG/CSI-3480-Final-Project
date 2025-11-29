@@ -66,7 +66,8 @@ function RegisterForm() {
     }
 
     const salt = randomString(32);
-    const verifier = pbkdf2Sync(password, salt, 1, 32).toString('hex');
+    // TODO: This iteration count be much higher in production.
+    const verifier = pbkdf2Sync(password, salt, 500, 32).toString('hex');
     const kek = await getKek(password, salt);
     const dek = randomString(32);
     const encDek = encryptDek(dek, kek);

@@ -3,16 +3,23 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { redirect } from 'next/navigation';
+import { pbkdf2Sync } from 'pbkdf2';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/Field';
 
-import { login } from '@/actions/auth';
+import { useDek } from '@/hooks/dek';
+
+import { getSalt, login } from '@/actions/auth';
+
 import { isValidEmail } from '@/util/string';
+import { decryptDek, getKek } from '@/util/client-auth';
 
 function LoginForm() {
+  const { dek, setDek } = useDek();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginDisabled, setLoginDisabled] = useState(true);
@@ -24,11 +31,26 @@ function LoginForm() {
       return;
     }
 
-    const loginSuccess = await login(email, password);
-    if (loginSuccess) {
-      redirect('/');
+    const salt = await getSalt(email);
+    if (!salt) {
+      setError('Login failed. Please check your email and password.');
+      return;
     }
-    setError('Login failed. Please check your email and password.');
+
+    // TODO: This iteration count be much higher in production.
+    const verifier = pbkdf2Sync(password, salt, 500, 32).toString('hex');
+
+    const encDek = await login(email, verifier);
+    if (!encDek) {
+      setError('Login failed. Please check your email and password.');
+      return;
+    }
+
+    const kek = await getKek(password, salt);
+    const dek = await decryptDek(encDek, kek);
+    setDek(dek);
+
+    redirect('/');
   }
 
   useEffect(() => {

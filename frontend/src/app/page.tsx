@@ -1,12 +1,9 @@
 import { redirect } from 'next/navigation';
 
-import { useDek } from '@/hooks/dek';
-
 import { getSession } from '@/util/auth';
+import Test from '@/components/Test';
 
 async function Home() {
-  const { dek, setDek } = useDek();
-  
   const session = await getSession();
 
   if (!session.isAuthenticated) {
@@ -16,7 +13,7 @@ async function Home() {
   return (
     <div>
       <p>Hello world!</p>
-      <p>DEK: {dek}</p>
+      <Test />
     </div>
   );
 }
