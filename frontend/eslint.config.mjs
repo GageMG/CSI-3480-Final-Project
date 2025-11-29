@@ -100,7 +100,6 @@ const eslintConfig = defineConfig([
       'prefer-rest-params': ['error'],
       'prefer-spread': ['error'],
       'prefer-template': ['error'],
-      'require-await': ['error'],
       'yoda': ['error']
     }
   },
@@ -120,6 +119,7 @@ const eslintConfig = defineConfig([
       '@typescript-eslint/stylistic-type-checked'
     ],
     rules: {
+      '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
