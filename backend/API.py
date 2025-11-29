@@ -1,69 +1,107 @@
-from database import (
-    create_user,
-    delete_user,
-    get_salt,
-    create_item,
-    delete_item,
-    get_all_user_items,
-    login_user
+from flask import Flask, request, jsonify
+from Func import (
+    db_get_salt,
+    db_create_user,
+    db_delete_user,
+    db_create_item,
+    db_delete_item,
+    db_get_all_user_items,
+    db_login_user
 )
 
+app = Flask(__name__)
 
-def db_get_salt(email):
-    response = get_salt(email)
-    if response is None:
-        return ""
-    return response
-
-
-def db_create_user(email, salt, verifier):
-    try:
-        guid = create_user(email, verifier, salt)
-        return guid
-    except Exception as e:
-        print(f"error creating user: {e}")
-        return None
+@app.route("/")
+def hello_world():
+    return "<p>Hello, World!</p>"
 
 
-def db_delete_user(guid):
-    try:
-        success = delete_user(guid)
-        return success
-    except Exception as e:
-        print(f"error deleting user: {e}")
-        return False
+@app.route("/get-salt", methods=["GET"])
+def get_salt_route():
+    email = request.args.get("email")
+    salt = db_get_salt(email)
+
+    if salt == "":
+        return jsonify({"salt": ""}), 401
+    return jsonify({"salt": salt}), 200
 
 
-def db_create_item(user_guid, name, username, password):
-    try:
-        create_item(user_guid, name, username, password)
-        return True
-    except Exception as e:
-        print(f"error creating item: {e}")
-        return False
+@app.route("/register", methods=["POST"])
+def register_route():
+    data = request.json
+    email = data["email"]
+    salt = data["salt"]
+    verifier = data["verifier"]
+
+    guid = db_create_user(email, salt, verifier)
+
+    if guid is None:
+        return jsonify({"error": "Registration failed"}), 400
+
+    return jsonify({"guid": guid}), 201
 
 
-def db_delete_item(item_guid):
-    try:
-        delete_item(item_guid)
-        return True
-    except Exception as e:
-        print(f"error deleting item: {e}")
-        return False
+@app.route("/login", methods=["POST"])
+def login_route():
+    data = request.json
+    email = data["email"]
+    verifier = data["verifier"]
+
+    guid = db_login_user(email, verifier)
+    if guid is None:
+        return jsonify({"error": "invalid login"}), 403
+
+    return jsonify({"guid": guid}), 200
 
 
-def db_get_all_user_items(user_guid):
-    try:
-        items = get_all_user_items(user_guid)
-        return items
-    except Exception as e:
-        print(f"error getting user items: {e}")
-        return None
+@app.route("/delete-user", methods=["DELETE"])
+def delete_user_route():
+    guid = request.args.get("guid")
+    success = db_delete_user(guid)
+
+    if success:
+        return "", 203
+    return "", 403
 
 
-def db_login_user(email, verifier):
-    try:
-        return login_user(email, verifier)
-    except Exception as e:
-        print(f"error logging in user: {e}")
-        return None
+@app.route("/create-item", methods=["POST"])
+def create_item_route():
+    data = request.json
+    item = data["item"]
+
+    user_guid = item["user_guid"]
+    name = item["name"]
+    username = item["username"]
+    password = item["password"]
+
+    success = db_create_item(user_guid, name, username, password)
+
+    if not success:
+        return jsonify({"error": "Could not save item"}), 500
+
+    return jsonify({"message": "Item saved"}), 201
+
+
+@app.route("/delete-item", methods=["DELETE"])
+def delete_item_route():
+    item_guid = request.args.get("item_guid")
+    success = db_delete_item(item_guid)
+
+    if success:
+        return "", 203
+    return "", 403
+
+
+@app.route("/get-user-items", methods=["GET"])
+def get_user_items_route():
+    user_guid = request.args.get("user_guid")
+    items = db_get_all_user_items(user_guid)
+
+    if items is None:
+        return jsonify({"error": "Could not retrieve items"}), 505
+
+    return jsonify({"items": items}), 200
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
