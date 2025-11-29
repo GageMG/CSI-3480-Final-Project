@@ -34,8 +34,12 @@ export async function getSalt(email: string): Promise<string | null> {
   return response.data.salt;
 }
 
+interface UserData {
+  guid: string;
+  encDek: string;
+}
 
-export async function login(email: string, verifier: string): Promise<string> {
+export async function login(email: string, verifier: string): Promise<UserData | ''> {
   const loginResponse = await post('/login', {
     email,
     verifier
@@ -44,8 +48,8 @@ export async function login(email: string, verifier: string): Promise<string> {
     return '';
   }
 
-  const encDek = loginResponse.data.encDek;
-  if(!encDek) {
+  const userData: UserData | '' = loginResponse.data;
+  if (!userData) {
     return '';
   }
 
@@ -53,5 +57,5 @@ export async function login(email: string, verifier: string): Promise<string> {
   session.isAuthenticated = true;
   await session.save();
 
-  return encDek;
+  return userData;
 }

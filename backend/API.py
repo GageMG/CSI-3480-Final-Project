@@ -31,10 +31,10 @@ def login():
     email = data["email"]
     verifier = data["verifier"]
 
-    encDek = db_login_user(email, verifier)
-    if encDek is None:
+    user_data = db_login_user(email, verifier)
+    if user_data is None:
         return "", 403
-    return jsonify({ "encDek": encDek }), 200
+    return jsonify(user_data), 200
 
 @app.route("/delete-user", methods=["DELETE"])
 def delete_user_route():

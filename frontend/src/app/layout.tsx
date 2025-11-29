@@ -5,6 +5,7 @@ import ThemeProvider from '@/components/ThemeProvider';
 
 import '@/styles/globals.css';
 import { ProvideDek } from '@/hooks/dek';
+import { ProvideUser } from '@/hooks/user';
 
 const roboto = Roboto({ subsets: ['latin'] });
 
@@ -24,7 +25,9 @@ function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
           disableTransitionOnChange
         >
           <ProvideDek>
-            {children}
+            <ProvideUser>
+              {children}
+            </ProvideUser>
           </ProvideDek>
         </ThemeProvider>
       </body>

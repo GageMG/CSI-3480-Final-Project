@@ -158,7 +158,6 @@ const eslintConfig = defineConfig([
       ],
       '@stylistic/comma-style': ['error'],
       '@stylistic/computed-property-spacing': ['error'],
-      '@stylistic/curly-newline': ['error', 'consistent'],
       '@stylistic/dot-location': ['error', 'property'],
       '@stylistic/eol-last': ['error'],
       '@stylistic/function-call-argument-newline': ['error', 'consistent'],

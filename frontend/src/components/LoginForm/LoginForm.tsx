@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/Field';
 
 import { useDek } from '@/hooks/dek';
+import { useUser } from '@/hooks/user';
 
 import { getSalt, login } from '@/actions/auth';
 
@@ -18,8 +19,9 @@ import { isValidEmail } from '@/util/string';
 import { decryptDek, getKek } from '@/util/client-auth';
 
 function LoginForm() {
-  const { dek, setDek } = useDek();
-  
+  const { setDek } = useDek();
+  const { setGuid } = useUser();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginDisabled, setLoginDisabled] = useState(true);
@@ -40,14 +42,17 @@ function LoginForm() {
     // TODO: This iteration count be much higher in production.
     const verifier = pbkdf2Sync(password, salt, 500, 32).toString('hex');
 
-    const encDek = await login(email, verifier);
-    if (!encDek) {
+    const userData = await login(email, verifier);
+    if (!userData) {
       setError('Login failed. Please check your email and password.');
       return;
     }
 
+    const { guid, encDek } = userData;
+    setGuid(guid);
+
     const kek = await getKek(password, salt);
-    const dek = await decryptDek(encDek, kek);
+    const dek = decryptDek(encDek, kek);
     setDek(dek);
 
     redirect('/');

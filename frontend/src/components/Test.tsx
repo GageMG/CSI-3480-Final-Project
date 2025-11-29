@@ -1,11 +1,18 @@
-'use client'
+'use client';
 
-import { useDek } from "@/hooks/dek";
+import { useDek } from '@/hooks/dek';
+import { useUser } from '@/hooks/user';
 
 function Test() {
-    const { dek, setDek } = useDek();
+  const { dek, setDek } = useDek();
+  const { guid, setGuid } = useUser();
 
-  return <p>DEK: {dek}</p>
+  return (
+    <div>
+      <p>GUID: {guid}</p>
+      <p>DEK: {dek}</p>
+    </div>
+  );
 }
 
 export default Test;

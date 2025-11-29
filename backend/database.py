@@ -70,8 +70,13 @@ def login_user(email, verifier):
     if user_data["verifier"] != verifier:
         print("Verifier mismatch.")
         return None
+    
+    guid = docs[0].id
 
-    return user_data["encDek"]
+    return {
+        "guid": guid,
+        "encDek": user_data["encDek"]
+    }
 
 # ITEM FUNCTIONS
 
