@@ -25,7 +25,7 @@ interface Errors {
 }
 
 function RegisterForm() {
-  const { dek, setDek } = useDek();
+  const { setDek } = useDek();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

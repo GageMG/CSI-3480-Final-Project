@@ -1,8 +1,5 @@
 'use server';
 
-import { redirect } from 'next/navigation';
-import { pbkdf2Sync } from 'pbkdf2';
-
 import { getSession } from '@/util/auth';
 import { get, post } from '@/util/api';
 
