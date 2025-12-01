@@ -1,21 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { PlusIcon } from 'lucide-react';
 
 import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import ItemCreationDialog from '@/components/ItemCreationDialog/ItemCreationDialog';
+import VaultItemListItem from '@/components/VaultItemListItem/VaultItemListItem';
 
 import { useUser } from '@/hooks/user';
-import { Button } from '@/components/ui/Button';
-import { PlusIcon } from 'lucide-react';
-import ItemCreationDialog from '../ItemCreationDialog/ItemCreationDialog';
-import { useDek } from '@/hooks/dek';
 
 function PasswordManager() {
-  const { encryptedItems, decryptedItems, setDecryptedItems, guid } = useUser();
+  const { encryptedItems, decryptedItems } = useUser();
 
   const [search, setSearch] = useState('');
-
-  const { dek } = useDek();
 
   return (
     <div className='grow p-4 flex flex-col gap-4'>
@@ -36,10 +34,11 @@ function PasswordManager() {
           </Button>
         </ItemCreationDialog>
       </div>
-      <p>{JSON.stringify(encryptedItems)}</p>
-      <p>{JSON.stringify(decryptedItems)}</p>
-      <p>{guid}</p>
-      <p>{dek}</p>
+      {
+        decryptedItems.map((decryptedItem, i) => {
+          return <VaultItemListItem vaultItem={decryptedItem} key={i} />;
+        })
+      }
     </div>
   );
 }

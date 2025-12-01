@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 
 import ThemeProvider from '@/components/ThemeProvider';
+import { Toaster } from '@/components/ui/Sonner';
 
 import { ProvideDek } from '@/hooks/dek';
 import { ProvideUser } from '@/hooks/user';
@@ -31,6 +32,7 @@ function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
             </ProvideUser>
           </ProvideDek>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
