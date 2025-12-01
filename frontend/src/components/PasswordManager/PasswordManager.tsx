@@ -38,7 +38,9 @@ function PasswordManager() {
         decryptedItems.length === 0 && <p>No items found.</p>
       }
       {
-        decryptedItems.map((decryptedItem, i) => {
+        decryptedItems.filter((decryptedItem) => {
+          return decryptedItem.name.toLowerCase().includes(search.toLowerCase());
+        }).map((decryptedItem, i) => {
           return <VaultItemListItem vaultItem={decryptedItem} key={i} />;
         })
       }
