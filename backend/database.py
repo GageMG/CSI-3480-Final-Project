@@ -56,6 +56,18 @@ def get_salt(email):
         return None
     return docs[0].to_dict().get("salt")
 
+def get_all_user_items(user_guid):
+    items_ref = db.collection("items")
+    docs = items_ref.where("user_guid", "==", user_guid).get()
+
+    results = []
+    for doc in docs:
+        data = doc.to_dict()
+        data["guid"] = doc.id
+        results.append(data)
+
+    print(f"Retrieved {len(results)} items.")
+    return results
 
 def login_user(email, verifier):
     users_ref = db.collection('users')
@@ -75,7 +87,8 @@ def login_user(email, verifier):
 
     return {
         "guid": guid,
-        "encDek": user_data["encDek"]
+        "encDek": user_data["encDek"],
+        "encryptedItems": get_all_user_items(guid)
     }
 
 # ITEM FUNCTIONS
@@ -104,17 +117,3 @@ def delete_item(guid):
     item_ref.delete()
     print(f"Item {guid} deleted.")
     return True
-
-
-def get_all_user_items(user_guid):
-    items_ref = db.collection("items")
-    docs = items_ref.where("user_guid", "==", user_guid).get()
-
-    results = []
-    for doc in docs:
-        data = doc.to_dict()
-        data["guid"] = doc.id
-        results.append(data)
-
-    print(f"Retrieved {len(results)} items.")
-    return results

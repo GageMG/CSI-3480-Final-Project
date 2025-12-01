@@ -4,5 +4,9 @@ export interface VaultItem {
   name: string;
   username: string;
   password: string;
-  twoFactor: string;
+}
+
+export interface DatabaseVaultItem extends VaultItem {
+  guid: string;
+  user_guid: string;
 }

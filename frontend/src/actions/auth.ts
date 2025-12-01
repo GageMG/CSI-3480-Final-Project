@@ -3,6 +3,8 @@
 import { getSession } from '@/util/auth';
 import { get, post } from '@/util/api';
 
+import { DatabaseVaultItem } from '@/types/password-manager';
+
 export async function register(
   email: string,
   verifier: string,
@@ -34,6 +36,7 @@ export async function getSalt(email: string): Promise<string | null> {
 interface UserData {
   guid: string;
   encDek: string;
+  encryptedItems: DatabaseVaultItem[];
 }
 
 export async function login(email: string, verifier: string): Promise<UserData | ''> {

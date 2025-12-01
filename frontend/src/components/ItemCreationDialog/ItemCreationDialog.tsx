@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -50,8 +49,7 @@ function ItemCreationDialog({ children }: { children?: React.ReactNode }) {
     const item: VaultItem = {
       name,
       username,
-      password,
-      twoFactor: ''
+      password
     };
 
     const encryptedItem: VaultItem = { ...item };
@@ -63,7 +61,7 @@ function ItemCreationDialog({ children }: { children?: React.ReactNode }) {
       encryptedItem[key as keyof typeof encryptedItem] = aes256Encrypt(dek, unencrypted);
     }
 
-    const responseStatus = await createItem(item, guid);
+    const responseStatus = await createItem(encryptedItem, guid);
 
     if (responseStatus !== 201) {
       setError('Saving item failed.');

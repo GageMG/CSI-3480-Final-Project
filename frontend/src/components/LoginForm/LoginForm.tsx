@@ -18,9 +18,12 @@ import { getSalt, login } from '@/actions/auth';
 import { isValidEmail } from '@/util/string';
 import { decryptDek, getKek } from '@/util/client-auth';
 
+import { DatabaseVaultItem, VaultItem } from '@/types/password-manager';
+import { aes256Decrypt } from '@/util/aes256';
+
 function LoginForm() {
   const { setDek } = useDek();
-  const { setGuid } = useUser();
+  const { setGuid, setEncryptedItems, setDecryptedItems } = useUser();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,12 +51,23 @@ function LoginForm() {
       return;
     }
 
-    const { guid, encDek } = userData;
+    const { guid, encDek, encryptedItems } = userData;
     setGuid(guid);
 
     const kek = await getKek(password, salt);
     const dek = decryptDek(encDek, kek);
     setDek(dek);
+
+    setEncryptedItems(encryptedItems);
+    const decryptedItems: VaultItem[] = [];
+    for (const encryptedItem of encryptedItems) {
+      decryptedItems.push({
+        name: encryptedItem.name ? aes256Decrypt(dek, encryptedItem.name) : '',
+        username: encryptedItem.username ? aes256Decrypt(dek, encryptedItem.username) : '',
+        password: encryptedItem.password ? aes256Decrypt(dek, encryptedItem.password) : ''
+      });
+    }
+    setDecryptedItems(decryptedItems);
 
     redirect('/');
   }
