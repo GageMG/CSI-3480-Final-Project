@@ -15,7 +15,8 @@ import { register } from '@/actions/auth';
 import { useDek } from '@/hooks/dek';
 
 import { isValidEmail, passwordMeetsRequirements, randomString } from '@/util/string';
-import { encryptDek, getKek } from '@/util/client-auth';
+import { getKek } from '@/util/client-auth';
+import { aes256Encrypt } from '@/util/aes256';
 
 interface Errors {
   email: string;
@@ -70,7 +71,7 @@ function RegisterForm() {
     const verifier = pbkdf2Sync(password, salt, 500, 32).toString('hex');
     const kek = await getKek(password, salt);
     const dek = randomString(32);
-    const encDek = encryptDek(dek, kek);
+    const encDek = aes256Encrypt(dek, kek);
 
     const registerStatus = await register(email, salt, verifier, encDek);
     if (registerStatus === 201) {

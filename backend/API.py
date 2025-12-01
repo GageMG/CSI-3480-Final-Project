@@ -49,12 +49,11 @@ def delete_user_route():
 @app.route("/create-item", methods=["POST"])
 def create_item_route():
     data = request.json
-    item = data["item"]
 
-    user_guid = item["user_guid"]
-    name = item["name"]
-    username = item["username"]
-    password = item["password"]
+    user_guid = data["userGuid"]
+    name = data["name"]
+    username = data["username"]
+    password = data["password"]
 
     success = db_create_item(user_guid, name, username, password)
 

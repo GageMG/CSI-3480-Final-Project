@@ -1,15 +1,15 @@
-// {
-//   "files.exclude": {
-//     // Folders
-//     ".next": true,
-//     "node_modules": true,
-//     // Files
-//     "components.json": true,
-//     "next-env.d.ts": true,
-//     "next.config.ts": true,
-//     "NEXT.md": true,
-//     "package-lock.json": true,
-//     "postcss.config.mjs": true,
-//     "tsconfig.json": true
-//   }
-// }
+{
+  "files.exclude": {
+    // Folders
+    ".next": true,
+    "node_modules": true,
+    // Files
+    "components.json": true,
+    "next-env.d.ts": true,
+    "next.config.ts": true,
+    "NEXT.md": true,
+    "package-lock.json": true,
+    "postcss.config.mjs": true,
+    "tsconfig.json": true
+  }
+}

@@ -10,8 +10,10 @@ const UserContext = createContext({
   setGuid: (guid: string) => {},
   encryptedItems: [] as VaultItem[],
   setEncryptedItems: (items: VaultItem[]) => {},
+  addEncryptedItem: (item: VaultItem) => {},
   decryptedItems: [] as VaultItem[],
-  setDecryptedItems: (items: VaultItem[]) => {}
+  setDecryptedItems: (items: VaultItem[]) => {},
+  addDecryptedItem: (item: VaultItem) => {}
 });
 
 // Our hook.
@@ -20,8 +22,10 @@ export function useUser(): {
   setGuid: (guid: string) => void;
   encryptedItems: VaultItem[];
   setEncryptedItems: (items: VaultItem[]) => void;
+  addEncryptedItem: (item: VaultItem) => void;
   decryptedItems: VaultItem[];
   setDecryptedItems: (items: VaultItem[]) => void;
+  addDecryptedItem: (item: VaultItem) => void;
 } {
   return useContext(UserContext);
 }
@@ -32,13 +36,43 @@ function useProvideUser() {
   const [encryptedItems, setEncryptedItems] = useState<VaultItem[]>([]);
   const [decryptedItems, setDecryptedItems] = useState<VaultItem[]>([]);
 
+  function addEncryptedItem(item: VaultItem) {
+    const items = [...encryptedItems, item];
+    items.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
+    setEncryptedItems(items);
+  }
+
+  function addDecryptedItem(item: VaultItem) {
+    const items = [...decryptedItems, item];
+    items.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
+    setDecryptedItems(items);
+  }
+
   return {
     guid,
     setGuid,
     encryptedItems,
     setEncryptedItems,
+    addEncryptedItem,
     decryptedItems,
-    setDecryptedItems
+    setDecryptedItems,
+    addDecryptedItem
   };
 }
 
