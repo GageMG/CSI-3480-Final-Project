@@ -42,6 +42,8 @@ function RegisterForm() {
   const [registerDisabled, setRegisterDisabled] = useState(true);
 
   async function handleRegister() {
+    setRegisterDisabled(true);
+
     let hasErrors = false;
     const foundErrors: Errors = {
       email: '',
@@ -65,6 +67,7 @@ function RegisterForm() {
 
     if (hasErrors) {
       setErrors(foundErrors);
+      setRegisterDisabled(false);
       return;
     }
 
@@ -79,6 +82,7 @@ function RegisterForm() {
     if (status === 201) {
       setDek(dek);
       setGuid(guid);
+      setRegisterDisabled(false);
       redirect('/');
     } else if (status === 409) {
       foundErrors.email = 'An account with this email already exists.';
@@ -86,6 +90,7 @@ function RegisterForm() {
       foundErrors.form = 'Registration failed. Please try again.';
     }
     setErrors(foundErrors);
+    setRegisterDisabled(false);
   }
 
   useEffect(() => {
@@ -117,6 +122,11 @@ function RegisterForm() {
                 setEmail(e.target.value);
               }}
               id='email'
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleRegister();
+                }
+              }}
             />
             <FieldError>{errors.email}</FieldError>
           </Field>
@@ -130,6 +140,11 @@ function RegisterForm() {
               }}
               type='password'
               id='password'
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleRegister();
+                }
+              }}
             />
             <FieldError>{errors.password}</FieldError>
           </Field>
@@ -143,6 +158,11 @@ function RegisterForm() {
               }}
               type='password'
               id='confirmPassword'
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleRegister();
+                }
+              }}
             />
             <FieldError>{errors.confirmPassword}</FieldError>
           </Field>

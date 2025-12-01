@@ -35,6 +35,9 @@ function PasswordManager() {
         </ItemCreationDialog>
       </div>
       {
+        decryptedItems.length === 0 && <p>No items found.</p>
+      }
+      {
         decryptedItems.map((decryptedItem, i) => {
           return <VaultItemListItem vaultItem={decryptedItem} key={i} />;
         })

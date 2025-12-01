@@ -16,9 +16,9 @@ import { useUser } from '@/hooks/user';
 import { getSalt, login } from '@/actions/auth';
 
 import { isValidEmail } from '@/util/string';
-import { decryptDek, getKek } from '@/util/client-auth';
+import { getKek } from '@/util/client-auth';
 
-import { DatabaseVaultItem, VaultItem } from '@/types/password-manager';
+import { VaultItem } from '@/types/password-manager';
 import { aes256Decrypt } from '@/util/aes256';
 
 function LoginForm() {
@@ -31,14 +31,18 @@ function LoginForm() {
   const [error, setError] = useState<string>('');
 
   async function handleLogin() {
+    setLoginDisabled(true);
+
     if (!isValidEmail(email)) {
       setError('Login failed. Please check your email and password.');
+      setLoginDisabled(false);
       return;
     }
 
     const salt = await getSalt(email);
     if (!salt) {
       setError('Login failed. Please check your email and password.');
+      setLoginDisabled(false);
       return;
     }
 
@@ -48,6 +52,7 @@ function LoginForm() {
     const userData = await login(email, verifier);
     if (!userData) {
       setError('Login failed. Please check your email and password.');
+      setLoginDisabled(false);
       return;
     }
 
@@ -69,10 +74,13 @@ function LoginForm() {
     }
     setDecryptedItems(decryptedItems);
 
+    setLoginDisabled(false);
+
     redirect('/');
   }
 
   useEffect(() => {
+    setError('');
     if (!email || !password) {
       setLoginDisabled(true);
       return;
@@ -91,7 +99,7 @@ function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className='flex flex-col gap-4'>
-        <FieldGroup>
+        <FieldGroup onSubmit={handleLogin}>
           <Field>
             <FieldLabel htmlFor='email'>Email</FieldLabel>
             <Input
@@ -101,6 +109,11 @@ function LoginForm() {
                 setEmail(e.target.value);
               }}
               id='email'
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleLogin();
+                }
+              }}
             />
           </Field>
           <Field>
@@ -113,6 +126,11 @@ function LoginForm() {
               }}
               type='password'
               id='password'
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleLogin();
+                }
+              }}
             />
           </Field>
           <FieldError>{error}</FieldError>
