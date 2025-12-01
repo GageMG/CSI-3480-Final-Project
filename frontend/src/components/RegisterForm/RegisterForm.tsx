@@ -17,6 +17,7 @@ import { useDek } from '@/hooks/dek';
 import { isValidEmail, passwordMeetsRequirements, randomString } from '@/util/string';
 import { getKek } from '@/util/client-auth';
 import { aes256Encrypt } from '@/util/aes256';
+import { useUser } from '@/hooks/user';
 
 interface Errors {
   email: string;
@@ -27,6 +28,7 @@ interface Errors {
 
 function RegisterForm() {
   const { setDek } = useDek();
+  const { setGuid } = useUser();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -71,13 +73,14 @@ function RegisterForm() {
     const verifier = pbkdf2Sync(password, salt, 500, 32).toString('hex');
     const kek = await getKek(password, salt);
     const dek = randomString(32);
-    const encDek = aes256Encrypt(dek, kek);
+    const encDek = aes256Encrypt(kek, dek);
 
-    const registerStatus = await register(email, salt, verifier, encDek);
-    if (registerStatus === 201) {
+    const { status, guid } = await register(email, salt, verifier, encDek);
+    if (status === 201) {
       setDek(dek);
+      setGuid(guid);
       redirect('/');
-    } else if (registerStatus === 409) {
+    } else if (status === 409) {
       foundErrors.email = 'An account with this email already exists.';
     } else {
       foundErrors.form = 'Registration failed. Please try again.';

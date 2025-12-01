@@ -18,7 +18,10 @@ def create_user(email, verifier, salt, encDek):
     
     existing_user = users_ref.where('email', '==', email).get()
     if len(existing_user) > 0:
-        return 409
+        return {
+        "status": 409,
+        "guid": ""
+    }
 
     guid = str(uuid.uuid4())
     users_ref.document(guid).set({
@@ -28,7 +31,10 @@ def create_user(email, verifier, salt, encDek):
         'encDek': encDek
     })
 
-    return 201
+    return {
+        "status": 201,
+        "guid": guid
+    }
 
 def delete_user(guid):
     user_ref = db.collection('users').document(guid)

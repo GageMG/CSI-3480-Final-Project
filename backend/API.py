@@ -22,8 +22,11 @@ def register():
     verifier = data["verifier"]
     encDek = data["encDek"]
 
-    status = db_create_user(email, salt, verifier, encDek)
-    return "", status
+    result = db_create_user(email, salt, verifier, encDek) 
+    return {
+        "status": result["status"],
+        "guid": result["guid"]
+    }, result["status"]
 
 @app.route("/login", methods=["POST"])
 def login():

@@ -8,11 +8,14 @@ import { useUser } from '@/hooks/user';
 import { Button } from '@/components/ui/Button';
 import { PlusIcon } from 'lucide-react';
 import ItemCreationDialog from '../ItemCreationDialog/ItemCreationDialog';
+import { useDek } from '@/hooks/dek';
 
 function PasswordManager() {
-  const { encryptedItems, decryptedItems, setDecryptedItems } = useUser();
+  const { encryptedItems, decryptedItems, setDecryptedItems, guid } = useUser();
 
   const [search, setSearch] = useState('');
+
+  const { dek } = useDek();
 
   return (
     <div className='grow p-4 flex flex-col gap-4'>
@@ -35,6 +38,8 @@ function PasswordManager() {
       </div>
       <p>{JSON.stringify(encryptedItems)}</p>
       <p>{JSON.stringify(decryptedItems)}</p>
+      <p>{guid}</p>
+      <p>{dek}</p>
     </div>
   );
 }

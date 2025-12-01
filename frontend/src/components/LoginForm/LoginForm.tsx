@@ -55,7 +55,7 @@ function LoginForm() {
     setGuid(guid);
 
     const kek = await getKek(password, salt);
-    const dek = decryptDek(encDek, kek);
+    const dek = aes256Decrypt(kek, encDek);
     setDek(dek);
 
     setEncryptedItems(encryptedItems);

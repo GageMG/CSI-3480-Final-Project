@@ -19,7 +19,7 @@ def db_create_user(email, verifier, salt, encDek):
    try:
       return create_user(email, verifier, salt, encDek)
    except Exception as e:
-      return 400
+      return { "status": 400 }
 
 def db_delete_user(guid):
     try:

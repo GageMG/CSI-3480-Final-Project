@@ -10,7 +10,10 @@ export async function register(
   verifier: string,
   salt: string,
   encDek: string
-): Promise<number> {
+): Promise<{
+  status: number;
+  guid: string;
+}> {
   const response = await post('/register', {
     email,
     salt,
@@ -22,7 +25,7 @@ export async function register(
     session.isAuthenticated = true;
     await session.save();
   }
-  return response.status;
+  return response.data;
 }
 
 export async function getSalt(email: string): Promise<string | null> {
